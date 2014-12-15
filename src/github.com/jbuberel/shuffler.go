@@ -2,43 +2,68 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"math/rand"
 )
 
+type Deck []int
+
+var (
+	numDecks int = 1000
+	numCards int = 52
+)
+
 func main() {
-	fmt.Printf("Creating deck of cards\n")
-	cards := make([]string, 52)
-	fmt.Printf("Initializing values\n")
+	r := rand.New(rand.NewSource(99))
+	decks := make([]Deck, numDecks)
+
+	// generate 1000 decks, and shuffle them	
+	for d := 0; d < len(decks); d++ {
 	
-	for i := 0; i < len(cards); i++ {
-		cards[i] = fmt.Sprintf("%v", i)
+		cards := make(Deck, numCards)
+		
+		// populate the deck with sequential entries
+		for i := 0; i < numCards; i++ {
+			cards[i] = i
+		}
+		
+		shuffle(r, cards)
+		
+		// store each shuffled deck
+		decks[d] = cards
+		
 	}
 	
-	fmt.Printf("Cards is now:\n")
-	for i, v := range cards {
-		fmt.Printf("%v - %v\n", i, v)
-	}
-	
-	fmt.Printf("About to shuffle\n")
-	shuffle(cards)
-	
-	fmt.Printf("Cards is now\n")
-	for i, v := range cards {
-		fmt.Printf("%v - %v\n", i, v)
-	}
-	
-	
+	fmt.Printf("Is fair? %v\n", isFair(decks))
 }
 
-func shuffle (cards []string) {
+func shuffle (r *rand.Rand, cards Deck) {
 	
-	r := rand.New(rand.NewSource(99))
-	l := len(cards)
-	for i := range cards {
-		j := r.Intn(l)
+	for i := 0; i < numCards; i++ {
+		j := r.Intn(numCards)
 		t := cards[i]
 		cards[i] = cards[j]
 		cards[j] = t
 	}
 	
+}
+
+func isFair (decks []Deck) (bool) {
+	
+	for i := 0; i < numCards; i++ {
+		sum := 0
+		stdDev := 0.0
+		for j := 0; j < numDecks; j++ {
+			sum += decks[j][i]
+			stdDev += (float64(numCards/2) - float64(decks[j][i])) * (float64(numCards/2) - float64(decks[j][i])) 
+		}
+		stdDev = math.Sqrt(stdDev/float64(numDecks))
+		avg := float64(sum/numDecks)
+		fmt.Printf("Avg: %v StdDev: %v\n", avg, stdDev)
+		if math.Abs(avg - float64(numCards/2)) > stdDev {
+			return false
+		}
+	}
+	
+	return true
 }
