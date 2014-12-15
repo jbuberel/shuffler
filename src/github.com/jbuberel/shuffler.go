@@ -27,17 +27,36 @@ func main() {
 			cards[i] = i
 		}
 		
-		shuffle(r, cards)
+		nullShuffle(r, cards)
 		
 		// store each shuffled deck
 		decks[d] = cards
 		
 	}
 	
-	fmt.Printf("Is fair? %v\n", isFair(decks))
+	fmt.Printf("Is null shuffle fair? %v\n", isFair(decks))
+	
+	// generate 1000 decks, and shuffle them	
+	for d := 0; d < len(decks); d++ {
+	
+		cards := make(Deck, numCards)
+		
+		// populate the deck with sequential entries
+		for i := 0; i < numCards; i++ {
+			cards[i] = i
+		}
+		
+		randomShuffle(r, cards)
+		
+		// store each shuffled deck
+		decks[d] = cards
+		
+	}
+	
+	fmt.Printf("Is random shuffle fair? %v\n", isFair(decks))
 }
 
-func shuffle (r *rand.Rand, cards Deck) {
+func randomShuffle(r *rand.Rand, cards Deck) {
 	
 	for i := 0; i < numCards; i++ {
 		j := r.Intn(numCards)
@@ -46,6 +65,10 @@ func shuffle (r *rand.Rand, cards Deck) {
 		cards[j] = t
 	}
 	
+}
+
+func nullShuffle(r *rand.Rand, cards Deck) {
+	return
 }
 
 func isFair (decks []Deck) (bool) {
@@ -59,14 +82,8 @@ func isFair (decks []Deck) (bool) {
 		}
 		stdDev = math.Sqrt(stdDev/float64(numDecks))
 		avg := float64(sum/numDecks)
-		fmt.Printf("Avg: %v StdDev: %v\n", avg, stdDev)
 		
-		// if the difference between the average value for this position in the deck
-		// and the value for a perfectly random set of numbers (numCards/2) is
-		// greater than one unit of standard deviation, this probably isn't a fair shuffle.
-		//
-		// a better solution would involve a two-tailed T test, but this is close enough.
-		if math.Abs(avg - float64(numCards/2)) > stdDev {
+		if math.Abs(avg - float64(numCards/2)) > stdDev/2 {
 			return false
 		}
 	}
