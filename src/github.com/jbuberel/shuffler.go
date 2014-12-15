@@ -71,6 +71,10 @@ func nullShuffle(r *rand.Rand, cards Deck) {
 	return
 }
 
+// For each position in the set of decks, this will compute the
+// average value and the standard deviation. A shuffle is considered
+// unfair if the average for any position is greater than half
+// the standard deviation away from the nominal mean (numCards/2).
 func isFair (decks []Deck) (bool) {
 	
 	for i := 0; i < numCards; i++ {
