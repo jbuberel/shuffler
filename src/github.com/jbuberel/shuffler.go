@@ -60,6 +60,12 @@ func isFair (decks []Deck) (bool) {
 		stdDev = math.Sqrt(stdDev/float64(numDecks))
 		avg := float64(sum/numDecks)
 		fmt.Printf("Avg: %v StdDev: %v\n", avg, stdDev)
+		
+		// if the difference between the average value for this position in the deck
+		// and the value for a perfectly random set of numbers (numCards/2) is
+		// greater than one unit of standard deviation, this probably isn't a fair shuffle.
+		//
+		// a better solution would involve a two-tailed T test, but this is close enough.
 		if math.Abs(avg - float64(numCards/2)) > stdDev {
 			return false
 		}
